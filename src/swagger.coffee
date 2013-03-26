@@ -229,7 +229,7 @@ class SwaggerResource
         if o.supportedContentTypes
           consumes = o.supportedContentTypes
 
-        op = new SwaggerOperation o.nickname, resource_path, o.httpMethod, o.parameters, o.summary, o.notes, o.responseClass, o.errorResponses, this, o.consumes, o.produces
+        op = new SwaggerOperation o.nickname, resource_path, o.httpMethod, o.parameters, o.summary, o.notes, o.examples, o.responseClass, o.errorResponses, this, o.consumes, o.produces
         @operations[op.nickname] = op
         @operationsArray.push op
 
@@ -328,7 +328,7 @@ class SwaggerModelProperty
 
 class SwaggerOperation
 
-  constructor: (@nickname, @path, @httpMethod, @parameters=[], @summary, @notes, @responseClass, @errorResponses, @resource, @consumes, @produces) ->
+  constructor: (@nickname, @path, @httpMethod, @parameters=[], @summary, @notes, @examples, @responseClass, @errorResponses, @resource, @consumes, @produces) ->
     @resource.api.fail "SwaggerOperations must have a nickname." unless @nickname?
     @resource.api.fail "SwaggerOperation #{nickname} is missing path." unless @path?
     @resource.api.fail "SwaggerOperation #{nickname} is missing httpMethod." unless @httpMethod?
@@ -454,7 +454,9 @@ class SwaggerOperation
         
         if args[param.name]
           reg = new RegExp '\{'+param.name+'[^\}]*\}', 'gi'
-          url = url.replace(reg, encodeURIComponent(args[param.name]))
+          # arangodb uses slashs in paramname 
+          # url = url.replace(reg, encodeURIComponent(args[param.name]))
+          url = url.replace(reg, args[param.name])
           delete args[param.name]
         else
           throw "#{param.name} is a required path param."
